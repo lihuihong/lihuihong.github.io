@@ -379,289 +379,20 @@
 
       
         
-          
-            <p>对OkHttp一些常用方法的简单封装：<br></p>
+          <p>对OkHttp一些常用方法的简单封装：<br></p>
 <ul>
 <li>包括根据请求地址，进行发起GET同步请求，并且返回Response信息</li>
 <li>根据请求地址，进行发起GET同步请求,并且返回String信息</li>
 <li>进行GET异步请求数据</li>
 <li>进行POST异步请求数据</li>
-<li>进行异步下载文件</li>
-</ul>
-<h2 id="相关代码-："><a href="#相关代码-：" class="headerlink" title="相关代码 ："></a>相关代码 ：</h2><pre><code>/**
- * Created by 那个谁 on 2018/1/20.
- * 奥特曼打小怪兽
- * 作用：OKhttp封装
- */
-
-public class OkhttpManger  {
-private static final String FILE_PREFIX=&quot;HEY&quot;;
-//OKhttp对象实例
-private OkHttpClient client;
-private static OkhttpManger okhttpManager;
-private Handler handler;
-
-private static OkhttpManger getInstance(){
-    if(okhttpManager==null){
-        okhttpManager=new OkhttpManger();
-    }
-    return  okhttpManager;
-}
-private OkhttpManger(){
-    client=new OkHttpClient();
-    handler=new Handler(Looper.getMainLooper());
-}
-/**
- * 同步Get请求方法
- * @param url
- * @return
- * @throws IOException
- */
-private Response p_getSync(String url)throws  IOException{
-    final Request request = new Request.Builder()
-            .url(url)
-            .build();
-    Call call = client.newCall(request);
-    Response response = call.execute();
-    return response;
-}
-
-/**
- * 进行发送同步GET请求，并且返回String类型数据
- * @param url
- * @return
- * @throws IOException
- */
-private String p_getSyncAsString(String url)throws  IOException{
-    Response response=p_getSync(url);
-    return response.body().string();
-}
-
-/**
- * 进行GET异步请求
- * @param url
- * @param callBack
- */
-private void p_getAsync(String url, final DataCallBack callBack){
-    final Request request=new Request.Builder().url(url).build();
-    client.newCall(request).enqueue(new Callback() {
-        @Override
-        public void onFailure(Request request, IOException e) {
-            deliverFailure(request, e, callBack);
-        }
-        /**
-         * 异步返回数据
-         * @param response
-         * @throws IOException
-         */
-        @Override
-        public void onResponse(Response response) throws IOException {
-            try {
-                deliverSuccess(response.body().string(), callBack);
-            }catch (IOException e){
-                deliverFailure(request,e,callBack);
-            }
-        }
-    });
-}
-/**
- *
- * @param url
- * @param params
- * @param callBack
- */
-private void p_postAsyncParams(String url,Map&lt;String,String&gt; params,final DataCallBack callBack){
-    RequestBody requestBody=null;
-    if(params==null){
-        params=new HashMap&lt;String,String&gt;();
-    }
-    FormEncodingBuilder builder=new FormEncodingBuilder();
-    for (Map.Entry&lt;String,String&gt; entry:params.entrySet()) {
-        String key=entry.getKey().toString();
-        String value=null;
-        if(entry.getValue()==null){
-            value=&quot;&quot;;
-        }else {
-            value=entry.getValue();
-        }
-        builder.add(key,value);
-    }
-    requestBody=builder.build();
-    final Request request=new Request.Builder().url(url).post(requestBody).build();
-    client.newCall(request).enqueue(new Callback() {
-        @Override
-        public void onFailure(Request request, IOException e) {
-            deliverFailure(request, e, callBack);
-        }
-
-        @Override
-        public void onResponse(Response response) throws IOException {
-            try {
-                deliverSuccess(response.body().string(), callBack);
-            }catch (IOException e){
-                deliverFailure(request,e,callBack);
-            }
-        }
-    });
-}
-/**
- * 进行异步下载文件
- * @param url  文件的地址
- * @param destDir  文件存储的绝对路径
- * @param callBack
- */
-private void p_downloadAsync(final String url, final String destDir,final DataCallBack callBack){
-    final Request request=new Request.Builder().url(url).build();
-    client.newCall(request).enqueue(new Callback() {
-        @Override
-        public void onFailure(Request request, IOException e) {
-            deliverFailure(request,e,callBack);
-        }
-        @Override
-        public void onResponse(Response response) throws IOException {
-            //开始进行写入文件
-            InputStream inputStream=null;
-            FileOutputStream fileOutputStream=null;
-            try {
-                inputStream=response.body().byteStream();
-                byte[] buffer=new byte[2048];
-                int len=0;
-                File file= new File(destDir,getFileName(url));
-                fileOutputStream=new FileOutputStream(file);
-                while((len=inputStream.read(buffer))!=-1){
-                    fileOutputStream.write(buffer,0,len);
-                }
-                fileOutputStream.flush();
-                deliverSuccess(file.getAbsolutePath(),callBack);
-            }catch (IOException e)
-            {
-                deliverFailure(request,e,callBack);
-            }finally {
-                if(fileOutputStream!=null){
-                    fileOutputStream.close();
-                }
-                if(inputStream!=null){
-                    inputStream.close();;
-                }
-            }
-        }
-    });
-}
-
-/**
- * 根据文件URL地址获取文件的路径文件名
- * @param pUrl
- * @return
- */
-private String getFileName(String pUrl){
-    int separatorIndex = pUrl.lastIndexOf(&quot;/&quot;);
-    String path=(separatorIndex &lt; 0) ? pUrl : pUrl.substring(separatorIndex + 1, pUrl.length());
-    return FILE_PREFIX+path;
-}
-//*************************数据请求成功或者失败分发方法**********************
-/**
- * 进行分发请求失败的数据情况
- * @param request
- * @param e
- * @param callBack
- */
-private void deliverFailure(final Request request,final IOException e, final DataCallBack callBack){
-    handler.post(new Runnable() {
-        @Override
-        public void run() {
-            if (callBack != null) {
-                callBack.requestFailure(request, e);
-            }
-        }
-    });
-}
-
-/**
- * 请求分发请求成功的数据情况
- * @param result
- * @param callBack
- */
-private void deliverSuccess(final String result, final DataCallBack callBack){
-    handler.post(new Runnable() {
-        @Override
-        public void run() {
-            if (callBack != null) {
-                callBack.requestSuccess(result);
-            }
-        }
-    });
-}
-
-//*************对外公布的方法********************
-
-/**
- * 根据请求地址，进行发起GET同步请求,并且返回Response信息
- * @param url
- * @return
- * @throws IOException
- */
-public static Response getSync(String url) throws IOException{
-    return  getInstance().p_getSync(url);
-}
-
-/**
- * 根据请求地址，进行发起GET同步请求,并且返回String信息
- * @param url
- * @return
- * @throws IOException
- */
-public static String getSyncAsString(String url)throws  IOException{
-    return getInstance().p_getSyncAsString(url);
-}
-
-/**
- * 进行GET异步请求数据
- * @param url
- * @param callBack
- */
-public static void getAsync(String url,DataCallBack callBack){
-    getInstance().p_getAsync(url, callBack);
-}
-
-/**
- * 进行POST异步请求数据
- * @param url
- * @param params  需要POST的数据
- * @param callBack
- */
-public static void postAsyncParams(String url,Map&lt;String,String&gt; params,DataCallBack callBack){
-    getInstance().p_postAsyncParams(url, params, callBack);
-}
-
-/**
- * 进行异步下载文件
- * @param url  文件地址
- * @param destDir  存入本地的路径
- * @param callBack 下载成功回调
- */
-public static void downloadAsync(String url,String destDir,DataCallBack callBack){
-    getInstance().p_downloadAsync(url,destDir,callBack);
-}
-
-//*************数据回调接口************************
-public interface DataCallBack{
-    /**
-     * 请求失败
-     * @param request
-     */
-    void requestFailure(Request request, Exception e);
-
-    /**
-     * 请求成功
-     * @param result
-     */
-    void requestSuccess(String result);
-}
-
-}
-</code></pre><p>代码还有很多地方需要改进的，近期会进行优化。</p>
-
-          
+<li>进行异步
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/01/22/一个简单的OkHttp封装/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -807,7 +538,7 @@ public interface DataCallBack{
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  1,079 字
+                  1,078 字
                 </span>
               
 
@@ -846,11 +577,7 @@ public interface DataCallBack{
       
         
           <pre><code>一.htmlunit简介
-</code></pre><p>Jsoup只能爬去静态页面，htmllunit相比于Jsoup可以模拟浏览器运行，可以抓取动态页面包括js操作，是一个强大的无界面Java浏览器，是junit的扩展之一，它提供了丰富的API，在读取页面后，您可以有效的使用htmlunit分析页面上的内容，并调用页面、填写表单、点击链接，就像您在“正常”浏览器中所作的一样。它具有相当好的JavaScript支持，并且能够使用相当复杂的AJAX库来工作，根据所使用的配置模拟Chrome、Firefox或Internet Explorer。HtmlUnit还可以用来进行页面的测试工作，实现网页自动化测试。<br></p>
-<pre><code>二.htmlunit使用
-</code></pre><ol>
-<li>需要引入jar包 <strong>htmlunit-2.29-OSG.jar</strong> <br><a href="http://download.csdn.net/download/qq_26420743/9811028" title="htmlunit-2.29-OSG.jar" target="_blank" rel="noopener">http://download.csdn.net/download/qq_26420743/9811028</a><br></li>
-<li>功能特点:<br><br>支持HTTP
+</code></pre><p>Jsoup只能爬去静态页面，htmllunit相比于Jsoup可以模拟浏览器运行，可以抓取动态页面包括js操作，是一个强大的无界面Java浏览器，是junit的扩展之一，它提供了丰富的API，在读取页面后，您可以有效的使用htmlunit分析页面上的内容，并调用页面、填写表单、点击链接，就像您在“正常”浏览器中所作的一样。它具有相当好的JavaScript支持，并且能够使用相当复杂的AJAX库来工作，根据所使用的配置模拟Chrome、Firefox或Internet Explorer。HtmlUnit还可以用来进行页面的测试工作，实现网页自动化
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2018/01/22/HtmlUnit初次使用/#more" rel="contents">

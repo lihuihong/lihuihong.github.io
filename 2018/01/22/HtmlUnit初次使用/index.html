@@ -88,7 +88,7 @@
 <meta property="og:description" content="一.htmlunit简介 Jsoup只能爬去静态页面，htmllunit相比于Jsoup可以模拟浏览器运行，可以抓取动态页面包括js操作，是一个强大的无界面Java浏览器，是junit的扩展之一，它提供了丰富的API，在读取页面后，您可以有效的使用htmlunit分析页面上的内容，并调用页面、填写表单、点击链接，就像您在“正常”浏览器中所作的一样。它具有相当好的JavaScript支持，并且能够使">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://i.imgur.com/BRsSrOg.png">
-<meta property="og:updated_time" content="2018-01-22T07:35:39.170Z">
+<meta property="og:updated_time" content="2018-01-22T07:57:19.507Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="HtmlUnit初次使用">
 <meta name="twitter:description" content="一.htmlunit简介 Jsoup只能爬去静态页面，htmllunit相比于Jsoup可以模拟浏览器运行，可以抓取动态页面包括js操作，是一个强大的无界面Java浏览器，是junit的扩展之一，它提供了丰富的API，在读取页面后，您可以有效的使用htmlunit分析页面上的内容，并调用页面、填写表单、点击链接，就像您在“正常”浏览器中所作的一样。它具有相当好的JavaScript支持，并且能够使">
@@ -364,7 +364,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  1,079 字
+                  1,078 字
                 </span>
               
 
@@ -402,11 +402,11 @@
 
       
         <pre><code>一.htmlunit简介
-</code></pre><p>Jsoup只能爬去静态页面，htmllunit相比于Jsoup可以模拟浏览器运行，可以抓取动态页面包括js操作，是一个强大的无界面Java浏览器，是junit的扩展之一，它提供了丰富的API，在读取页面后，您可以有效的使用htmlunit分析页面上的内容，并调用页面、填写表单、点击链接，就像您在“正常”浏览器中所作的一样。它具有相当好的JavaScript支持，并且能够使用相当复杂的AJAX库来工作，根据所使用的配置模拟Chrome、Firefox或Internet Explorer。HtmlUnit还可以用来进行页面的测试工作，实现网页自动化测试。<br></p>
+</code></pre><p>Jsoup只能爬去静态页面，htmllunit相比于Jsoup可以模拟浏览器运行，可以抓取动态页面包括js操作，是一个强大的无界面Java浏览器，是junit的扩展之一，它提供了丰富的API，在读取页面后，您可以有效的使用htmlunit分析页面上的内容，并调用页面、填写表单、点击链接，就像您在“正常”浏览器中所作的一样。它具有相当好的JavaScript支持，并且能够使用相当复杂的AJAX库来工作，根据所使用的配置模拟Chrome、Firefox或Internet Explorer。HtmlUnit还可以用来进行页面的测试工作，实现网页自动化<a id="more"></a> <!--more-->测试。<br></p>
 <pre><code>二.htmlunit使用
 </code></pre><ol>
 <li>需要引入jar包 <strong>htmlunit-2.29-OSG.jar</strong> <br><a href="http://download.csdn.net/download/qq_26420743/9811028" title="htmlunit-2.29-OSG.jar" target="_blank" rel="noopener">http://download.csdn.net/download/qq_26420743/9811028</a><br></li>
-<li>功能特点:<br><br>支持HTTP<a id="more"></a> <!--more-->和HTTPS协议<br><br>支持Cookie<br><br>能够指定服务器的失败响应是否应该抛出异常，或者应该返回为适当类型的页面（基于内容类型）<br><br>支持提交方法POST和GET（以及HEAD，DELETE，…）<br><br>能够自定义要发送到服务器的请求头<br><br>支持HTML响应<br><br>HTML页面的包装器，可以轻松访问其中包含的所有信息<br><br>支持提交表单<br><br>支持点击链接<br><br>支持步行HTML文档的DOM模型<br><br>代理服务器支持<br><br>支持基本和NTLM身份验证<br><br>优秀的JavaScript支持<br><br>支持将拿到的网页转成Document对象<br></li>
+<li>功能特点:<br><br>支持HTTP和HTTPS协议<br><br>支持Cookie<br><br>能够指定服务器的失败响应是否应该抛出异常，或者应该返回为适当类型的页面（基于内容类型）<br><br>支持提交方法POST和GET（以及HEAD，DELETE，…）<br><br>能够自定义要发送到服务器的请求头<br><br>支持HTML响应<br><br>HTML页面的包装器，可以轻松访问其中包含的所有信息<br><br>支持提交表单<br><br>支持点击链接<br><br>支持步行HTML文档的DOM模型<br><br>代理服务器支持<br><br>支持基本和NTLM身份验证<br><br>优秀的JavaScript支持<br><br>支持将拿到的网页转成Document对象<br></li>
 <li>具体使用：<br><br>既然是爬虫，当然就是要抓取数据，Java最常用的是Jsoup，但是它只能抓取静态网页的数据，对于Js，Ajax加载的动态网页是抓取不到数据的，这个时候，就需要用HtnlUnit这个强大的工具了。<br></li>
 </ol>
 <p>-爬取网页并转化为Document对象：<br></p>
